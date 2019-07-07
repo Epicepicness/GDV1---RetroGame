@@ -1,0 +1,128 @@
+﻿using UnityEngine;
+
+public class Ball : MonoBehaviour {
+
+	[Header ("Movement Related Variables")]
+	[Tooltip ("float ballInitialVelocity is the velocity the ball is launched with when fired.")]
+	[SerializeField] private float ballInitialVelocity = 300f;
+	[Tooltip ("int impactDamage is the 'damage' the ball does to damagable blocks.")]
+	[SerializeField] private int impactDamage = 1;
+
+	private bool ballInPlay = false;
+
+	//Object Components
+	private Rigidbody2D rb;
+	private Transform transform;
+	 
+	private void Awake () {
+		rb = GetComponent<Rigidbody2D> ();
+		transform = GetComponent<Transform> ();
+	}
+
+	private void Update () {
+		if (Input.GetButtonDown ("Fire") && !ballInPlay) {
+			transform.parent = null;
+			ballInPlay = true;
+			float zAngle = Random.Range (45, 135);
+
+			Quaternion rotation = Quaternion.Euler (0, 0, zAngle);
+			transform.rotation = rotation;
+			rb.WakeUp ();
+			rb.AddForce (new Vector2 (ballInitialVelocity, ballInitialVelocity));
+		}
+	}
+
+	private void OnCollisionEnter2D (Collision2D col) {
+		IDamageable damageableObject = col.transform.GetComponent<IDamageable> ();
+		if (damageableObject != null) {
+			damageableObject.TakeDamage (impactDamage);
+		}
+
+		Player playerObject = col.transform.GetComponent<Player> ();
+		if (playerObject != null) {
+			Vector2 impactAdjustmentVector = playerObject.velocityTransfer ();
+		}
+	}
+
+}
+
+
+/*
+using UnityEngine;
+
+public class Ball : MonoBehaviour {
+
+	[Header ("Movement Related Variables")]
+  	[Tooltip ("float movementSpeed is the maximum movement speed for the ball.")]
+	[SerializeField] private float movementSpeed = .2f;
+  	[Tooltip ("LayerMask collisionMask are the layers the player's bar can collide with.")]
+	[SerializeField] private LayerMask collisionMask;
+
+	[SerializeField] private int damage = 1;
+
+	private bool ballInPlay = false;
+  	private float ballDiameter;
+
+	//Object Components
+	private Transform transform;
+	 
+	private void Awake () {
+		transform = GetComponent<Transform> ();
+
+		ballDiameter = transform.localScale.x;
+	}
+
+	private void Update () {
+		//CheckCollision ();
+
+		if (Input.GetButtonDown ("Fire") && !ballInPlay) {
+			transform.parent = null;
+			ballInPlay = true;
+			float zAngle = Random.Range (45, 135);
+
+			Quaternion rotation = Quaternion.Euler (0, 0, zAngle);
+			transform.rotation = rotation;
+		}
+		if (ballInPlay) {
+			Vector2 moveVector = Vector2.right * movementSpeed * Time.deltaTime;
+			transform.Translate (moveVector);
+		}
+	}
+	
+	private void CheckCollision () {
+		RaycastHit2D hit = Physics2D.Raycast (transform.position, DegreeToVector2 (transform.rotation.eulerAngles.z), ballDiameter / 2 + movementSpeed * Time.deltaTime, collisionMask);
+		Debug.DrawRay (transform.position, DegreeToVector2(transform.rotation.eulerAngles.z) * (ballDiameter/2 + movementSpeed), Color.yellow);
+
+		if (hit) {
+			OnHitObject (ref hit);
+		}
+	}
+
+	private void OnHitObject (ref RaycastHit2D hit) {
+		//Vector2 incomingVec = hit.point - (Vector2)transform.position;
+		Vector2 incomingVec = DegreeToVector2 (transform.rotation.eulerAngles.z);
+		Vector2 reflectVec = Vector2.Reflect (incomingVec, hit.normal);
+
+		float turningAngle = Vector2.Angle (incomingVec, reflectVec);
+
+		transform.rotation = Quaternion.Euler (0, 0, turningAngle + transform.rotation.eulerAngles.z);
+
+		IDamageable damageableObject = hit.collider.GetComponent<IDamageable> ();
+		if (damageableObject != null) {
+			damageableObject.TakeHit (damage, hit.point);
+		}
+	}
+	
+	private Vector2 RadianToVector2 (float r) {
+		return new Vector2 (Mathf.Cos(r), Mathf.Sin(r));
+	}
+
+	private Vector2 DegreeToVector2 (float d) {
+		return RadianToVector2 (d * Mathf.Deg2Rad);
+	}
+
+}
+
+*/
+
+

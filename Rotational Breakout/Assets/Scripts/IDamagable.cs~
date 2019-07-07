@@ -1,0 +1,8 @@
+﻿using UnityEngine;
+
+public interface IDamagable {
+
+	void TakeHit (ref int damage, ref Vector2 hitPoint);
+
+	void TakeDamage (ref int damage);
+}

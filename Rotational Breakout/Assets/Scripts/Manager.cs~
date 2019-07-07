@@ -1,0 +1,17 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Manager : MonoBehaviour {
+
+	private Player player;
+	private List<Controller> controllers = new List<Controller> ();
+
+	private void Start () {
+		Controller c;
+		player = new Player(out c);
+
+		controllers.Add(c);
+	}
+
+}

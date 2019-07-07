@@ -1,0 +1,23 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerManager : MonoBehaviour {
+
+	private Player player;
+	private List<PlayerInput> controllers = new List<PlayerInput>();
+
+	private void Start() {
+		PlayerInput c;
+		player = new Player(out c);
+
+		controllers.Add(c);
+	}
+
+	private void Update() {
+		for (int i = 0; i < controllers.Count; ++i) {
+			controllers [i].Update();
+		}
+	}
+
+}

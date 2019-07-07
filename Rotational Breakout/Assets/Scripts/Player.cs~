@@ -1,0 +1,84 @@
+﻿using UnityEngine;
+
+[RequireComponent(typeof(BoxCollider2D))]
+public class Player : MonoBehaviour {
+
+	//Doe de Player controles in een Finite State Machine, zodat je een controller hebt voor Horizontal, Free Moving en Rotational
+
+	[Header ("Movement Related Variables")]
+	[Tooltip ("float maximumSpeed is the maximum movement speed for the player's bar.")]
+	[SerializeField] private float maximumSpeed;
+	[Tooltip ("float timeToAccelerate is the time in seconds to reach maximumSpeed.")]
+	[SerializeField] private float timeToAccelerate;
+	[Tooltip ("float timeToDeccelerate is the time in seconds to stand still from maximumSpeed.")]
+	[SerializeField] private float timeToDeccelerate;
+	private float accelerationSpeed;						//Stores the increase in speed per second, calculated based on the maximumSpeed and the timeToAccelerate.
+	private float deccelerationSpeed;						//Stores the decrease in speed per second, calculated based on the maximumSpeed and the timeToDeccelerate.
+	private Vector2 currentSpeed;							//Stores the current speed the bar is moving in.
+	private Vector2 directionalInput;						//Stores the directional input, called from the PlayerInput script.
+
+	[Header ("Collision Related Variables")]
+	[Tooltip ("LayerMask collisionMask are the layers the player's bar can collide with.")]
+	[SerializeField] private LayerMask collisionMask;
+	[Tooltip ("float velocityTransferPercentile is the percental amount of the pallet's movement that transfers to the ball on collision.")]
+	[SerializeField] private float velocityTransferPercentile;
+
+	private void Start () {
+		accelerationSpeed = Mathf.Abs (maximumSpeed / timeToAccelerate);
+		deccelerationSpeed = Mathf.Abs (maximumSpeed / timeToDeccelerate);
+	}
+
+	private void Update () {
+		MoveHorizontal ();
+	}
+
+	//Sets the player movement input, called from the PlayerInput script.
+	public void SetDirectionalInput (ref Vector2 input) {
+		directionalInput = input;
+	}
+
+	public void LaunchBall () {
+
+	}
+
+	public Vector2 velocityTransfer () {
+		Vector2 v = currentSpeed * velocityTransferPercentile;
+		return v;
+	}
+
+	//The function that handles Horizontal movement of the pallet.
+	private void MoveHorizontal () {
+		if (directionalInput.x != 0) {
+			if (Mathf.Abs (currentSpeed.x) < maximumSpeed) {
+				//Increase in speed until it reaches maximumSpeed
+				currentSpeed.x += (accelerationSpeed * directionalInput.x) * Time.deltaTime;
+			} else {
+				//Movement at maximumSpeed
+				currentSpeed.x = maximumSpeed * directionalInput.x;
+			}
+		} else {
+			if (Mathf.Abs (currentSpeed.x) - deccelerationSpeed * 2 * Time.deltaTime > 0) {
+				//Decrease in speed until it stands still
+				currentSpeed.x -= deccelerationSpeed * Mathf.Sign (currentSpeed.x) * Time.deltaTime;
+			} else {
+				//No Movement
+				currentSpeed.x = 0;
+				return;
+			}
+		}
+		//Checking if a wall is hit
+		float rayDistance = transform.localScale.x / 2 + currentSpeed.x * directionalInput.x * Time.deltaTime;
+		RaycastHit2D hit = Physics2D.Raycast (transform.position, new Vector2 (Mathf.Sign (currentSpeed.x), 0), rayDistance, collisionMask);
+		float newPositionX;
+		if (hit) {
+			newPositionX = transform.position.x + (hit.distance - transform.localScale.x / 2) * Mathf.Sign (currentSpeed.x);
+			currentSpeed.x = 0;
+		} else {
+			newPositionX = transform.position.x + currentSpeed.x;
+		}
+		//The actual movement of the paddle
+		Vector2 newPosition = new Vector2 (newPositionX, transform.position.y);
+		transform.position = newPosition;
+	}
+
+}

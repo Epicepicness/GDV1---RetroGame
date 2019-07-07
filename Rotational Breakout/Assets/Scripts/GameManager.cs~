@@ -1,0 +1,44 @@
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+public class GameManager : MonoBehaviour {
+
+	//Managers
+	public static GameManager instance = null;
+	private PlayerInput playerInput;
+	private UIManager uIManager;
+	private Player player;
+
+	//Level-related variables.
+	private int totalScore = 0;
+	private int levelStartScore;
+
+	private const int maxLevels = 3;								//Saves the total amount of scenes in the game.
+	[HideInInspector] public int currentLevel = 0;					//Saves the number for the current level.
+
+	public int lives = 3;
+	[SerializeField] private List<GameObject> bricks = new List<GameObject> ();
+
+	private void Awake () {
+		if (instance == null)
+			instance = this;
+		else if (instance != this)
+			Destroy (this.gameObject);
+		DontDestroyOnLoad (this.gameObject);
+
+		uIManager = (GameObject.Find ("UIManager")) ? GameObject.Find ("UIManager").GetComponent<UIManager> () : 
+			((GameObject)Instantiate (Resources.Load("Managers/UIManager"), Vector3.zero, Quaternion.identity)).GetComponent<UIManager> ();
+		player = (GameObject.Find ("Player")) ? GameObject.Find ("Player").GetComponent<Player> () : 
+			((GameObject)Instantiate (Resources.Load("Prefabs/Player"), Vector3.zero, Quaternion.identity)).GetComponent<Player> ();
+		playerInput = new PlayerInput (player);
+	}
+
+	private void Update () {
+		playerInput.GameUpdate ();
+	}
+
+	private void NewLevelSetup () {
+		levelStartScore = totalScore;
+	}
+
+}

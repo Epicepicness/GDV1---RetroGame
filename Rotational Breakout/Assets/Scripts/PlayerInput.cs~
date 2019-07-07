@@ -1,0 +1,22 @@
+﻿using UnityEngine;
+
+public class PlayerInput {
+
+	Player player;
+
+	public PlayerInput (Player p) {
+		player = p;
+	}
+
+	public void MenuUpdate (){}
+
+	public void GameUpdate () {
+		Vector2 directionalInput = new Vector2 (Input.GetAxisRaw ("Horizontal"), Input.GetAxisRaw ("Vertical"));
+		player.SetDirectionalInput (ref directionalInput);
+
+		if (Input.GetButtonDown ("Fire")) {
+			player.LaunchBall ();
+		}
+	}
+
+}

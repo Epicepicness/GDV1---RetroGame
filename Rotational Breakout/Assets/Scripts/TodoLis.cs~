@@ -1,0 +1,23 @@
+﻿
+/*
+
+
+ - De Balk acceleration time =/= deceleration time
+ 	deceleration zou iets hoger (kortere tijd) moeten zijn dan de acceleration.
+ - Bletje velocity toevoegen aan balletje bij afschieten.
+ - Balletje velocity toevoegen afhankelijk van bletje velocity tijdens impact.
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+*/

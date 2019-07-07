@@ -1,0 +1,27 @@
+﻿using UnityEngine;
+
+public class ScoreBrick : MonoBehaviour, IDamageable {
+
+	[SerializeField] private int startHealth;
+	private int currentHealth;
+
+	private void Start () {
+		currentHealth = startHealth;
+	}
+
+	public void TakeHit (int damage, Vector2 hitPoint) {
+		TakeDamage (damage);
+	}
+
+	public void TakeDamage (int damage) {
+		currentHealth -= damage;
+		if (currentHealth <= 0) {
+			Die ();
+		}
+	}
+
+	private void Die () {
+		Destroy (this.gameObject);
+	}
+
+}

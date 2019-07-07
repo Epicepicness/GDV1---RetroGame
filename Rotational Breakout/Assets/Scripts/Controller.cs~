@@ -1,0 +1,20 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Controller : MonoBehaviour {
+	
+	private Player player;
+
+	public Controller (Player p) {
+		player = p;
+	}
+
+	public void Update () {
+		if (Input.GetAxis ("Horizontal") != 0) {
+
+			player.Move (Input.GetAxis("Horizontal"));
+		}
+	}
+
+}
